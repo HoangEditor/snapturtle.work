@@ -1,0 +1,1209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Snapturtle — Real Estate Video Editing</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Mono:wght@300;400;500&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #08090d;
+    --surface: #0f1118;
+    --card: #13151f;
+    --border: rgba(255,255,255,0.07);
+    --accent: #c8a96e;
+    --accent2: #7eb8c8;
+    --text: #e8e4dc;
+    --muted: #7a7870;
+    --white: #f5f2ec;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Outfit', sans-serif;
+    font-weight: 300;
+    overflow-x: hidden;
+    line-height: 1.7;
+  }
+
+  /* ── GRAIN OVERLAY ── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 999;
+    opacity: 0.4;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.4rem 4rem;
+    background: rgba(8,9,13,0.85);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .logo {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.6rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    color: var(--white);
+  }
+
+  .logo span { color: var(--accent); }
+
+  nav ul {
+    display: flex;
+    gap: 2.5rem;
+    list-style: none;
+  }
+
+  nav a {
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 0.8rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    transition: color 0.3s;
+  }
+
+  nav a:hover { color: var(--accent); }
+
+  .nav-cta {
+    background: var(--accent);
+    color: #08090d !important;
+    padding: 0.6rem 1.4rem;
+    border-radius: 2px;
+    font-weight: 500;
+    transition: opacity 0.3s !important;
+  }
+
+  .nav-cta:hover { opacity: 0.85; color: #08090d !important; }
+
+  /* ── HERO ── */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    padding: 8rem 4rem 5rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-bg {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 80% 60% at 70% 50%, rgba(200,169,110,0.06) 0%, transparent 70%),
+      radial-gradient(ellipse 50% 70% at 20% 80%, rgba(126,184,200,0.04) 0%, transparent 60%);
+  }
+
+  .hero-grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+    background-size: 60px 60px;
+    mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 30%, transparent 100%);
+  }
+
+  .hero-content {
+    position: relative;
+    max-width: 780px;
+  }
+
+  .hero-eyebrow {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+  }
+
+  .hero-eyebrow::before {
+    content: '';
+    width: 32px;
+    height: 1px;
+    background: var(--accent);
+  }
+
+  h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(3rem, 7vw, 5.5rem);
+    font-weight: 300;
+    line-height: 1.05;
+    color: var(--white);
+    margin-bottom: 1.8rem;
+    letter-spacing: -0.01em;
+  }
+
+  h1 em {
+    font-style: italic;
+    color: var(--accent);
+  }
+
+  .hero-sub {
+    font-size: 1.05rem;
+    color: var(--muted);
+    max-width: 520px;
+    margin-bottom: 3rem;
+    line-height: 1.8;
+  }
+
+  .hero-actions {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .btn-primary {
+    background: var(--accent);
+    color: #08090d;
+    padding: 0.9rem 2.2rem;
+    border-radius: 2px;
+    font-weight: 500;
+    font-size: 0.85rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: opacity 0.3s, transform 0.3s;
+    display: inline-block;
+  }
+
+  .btn-primary:hover { opacity: 0.88; transform: translateY(-1px); }
+
+  .btn-secondary {
+    color: var(--text);
+    padding: 0.9rem 2.2rem;
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    font-size: 0.85rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: border-color 0.3s, color 0.3s;
+    display: inline-block;
+  }
+
+  .btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
+
+  .hero-stats {
+    position: absolute;
+    right: 4rem;
+    bottom: 5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    text-align: right;
+  }
+
+  .stat-num {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 2.8rem;
+    font-weight: 300;
+    color: var(--white);
+    line-height: 1;
+  }
+
+  .stat-num span { color: var(--accent); font-size: 1.6rem; }
+
+  .stat-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-top: 0.3rem;
+  }
+
+  /* ── SECTION SHARED ── */
+  section { padding: 7rem 4rem; }
+
+  .section-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--accent2);
+    margin-bottom: 1rem;
+  }
+
+  h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(2rem, 4vw, 3.2rem);
+    font-weight: 300;
+    color: var(--white);
+    line-height: 1.15;
+    margin-bottom: 1rem;
+  }
+
+  .section-sub {
+    color: var(--muted);
+    max-width: 520px;
+    font-size: 0.95rem;
+  }
+
+  /* ── DIVIDER ── */
+  .divider {
+    width: 100%;
+    height: 1px;
+    background: var(--border);
+    margin: 0 4rem;
+    width: calc(100% - 8rem);
+  }
+
+  /* ── SERVICES / FEATURES ── */
+  .features {
+    background: var(--surface);
+  }
+
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--border);
+    margin-top: 4rem;
+    border: 1px solid var(--border);
+  }
+
+  .feature-card {
+    background: var(--card);
+    padding: 2.5rem;
+    transition: background 0.3s;
+  }
+
+  .feature-card:hover { background: #191c29; }
+
+  .feat-icon {
+    width: 40px;
+    height: 40px;
+    margin-bottom: 1.5rem;
+    color: var(--accent);
+  }
+
+  .feat-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.25rem;
+    font-weight: 400;
+    color: var(--white);
+    margin-bottom: 0.7rem;
+  }
+
+  .feat-desc {
+    font-size: 0.88rem;
+    color: var(--muted);
+    line-height: 1.75;
+  }
+
+  /* ── PRICING ── */
+  #pricing {
+    background: var(--bg);
+    position: relative;
+    overflow: hidden;
+  }
+
+  #pricing::before {
+    content: '';
+    position: absolute;
+    top: -200px; left: 50%;
+    transform: translateX(-50%);
+    width: 600px; height: 600px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(200,169,110,0.05) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .pricing-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 4rem;
+    flex-wrap: wrap;
+    gap: 2rem;
+  }
+
+  .pricing-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+  }
+
+  .price-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 2.8rem;
+    position: relative;
+    transition: border-color 0.3s, transform 0.3s;
+    overflow: hidden;
+  }
+
+  .price-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .price-card:hover { border-color: rgba(200,169,110,0.25); transform: translateY(-3px); }
+  .price-card:hover::before { opacity: 1; }
+
+  .price-card.featured {
+    border-color: rgba(200,169,110,0.3);
+    background: linear-gradient(145deg, #16192a, #13151f);
+  }
+
+  .price-card.featured::before { opacity: 1; }
+
+  .price-badge {
+    position: absolute;
+    top: 1.5rem; right: 1.5rem;
+    background: var(--accent);
+    color: #08090d;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 0.3rem 0.7rem;
+    border-radius: 2px;
+    font-weight: 500;
+  }
+
+  .plan-name {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 0.5rem;
+  }
+
+  .plan-tagline {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 1rem;
+    color: var(--muted);
+    margin-bottom: 2rem;
+    display: block;
+  }
+
+  .plan-price {
+    display: flex;
+    align-items: baseline;
+    gap: 0.3rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .price-dollar {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.2rem;
+    color: var(--muted);
+  }
+
+  .price-amount {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 4rem;
+    font-weight: 300;
+    color: var(--white);
+    line-height: 1;
+  }
+
+  .price-per {
+    font-size: 0.8rem;
+    color: var(--muted);
+  }
+
+  .plan-turnaround {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--accent2);
+    letter-spacing: 0.1em;
+    margin-bottom: 0.3rem;
+  }
+
+  .plan-length {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+    margin-bottom: 2rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .feature-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+    margin-bottom: 2.5rem;
+  }
+
+  .feature-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    font-size: 0.875rem;
+    color: var(--text);
+    line-height: 1.5;
+  }
+
+  .feature-list li::before {
+    content: '✦';
+    color: var(--accent);
+    font-size: 0.55rem;
+    margin-top: 0.4rem;
+    flex-shrink: 0;
+  }
+
+  .feature-list li.highlight {
+    color: var(--accent);
+    font-weight: 500;
+  }
+
+  .edit-note {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.68rem;
+    color: var(--muted);
+    letter-spacing: 0.08em;
+    margin-bottom: 2rem;
+    padding: 0.8rem 1rem;
+    border-left: 2px solid var(--accent);
+    background: rgba(200,169,110,0.04);
+  }
+
+  .plan-cta {
+    display: block;
+    text-align: center;
+    padding: 0.9rem;
+    border-radius: 2px;
+    font-size: 0.8rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.3s;
+  }
+
+  .cta-outline {
+    border: 1px solid var(--border);
+    color: var(--text);
+  }
+
+  .cta-outline:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .cta-filled {
+    background: var(--accent);
+    color: #08090d;
+  }
+
+  .cta-filled:hover { opacity: 0.88; }
+
+  /* ── UPGRADES ── */
+  .upgrades-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin-top: 1.5rem;
+  }
+
+  .upgrade-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 1.5rem 1.8rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: border-color 0.3s;
+  }
+
+  .upgrade-card:hover { border-color: rgba(200,169,110,0.2); }
+
+  .upgrade-name {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.12em;
+    color: var(--text);
+    margin-bottom: 0.3rem;
+  }
+
+  .upgrade-desc {
+    font-size: 0.8rem;
+    color: var(--muted);
+  }
+
+  .upgrade-price {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.5rem;
+    color: var(--accent);
+    white-space: nowrap;
+    font-weight: 400;
+  }
+
+  /* ── RETAINER BANNER ── */
+  .retainer-banner {
+    margin-top: 2rem;
+    background: linear-gradient(135deg, #16192a, #13151f);
+    border: 1px solid rgba(200,169,110,0.25);
+    border-radius: 4px;
+    padding: 2.5rem 3rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 2rem;
+    flex-wrap: wrap;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .retainer-banner::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+  }
+
+  .retainer-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent2);
+    margin-bottom: 0.5rem;
+  }
+
+  .retainer-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.8rem;
+    font-weight: 300;
+    color: var(--white);
+    line-height: 1.2;
+  }
+
+  .retainer-desc {
+    font-size: 0.88rem;
+    color: var(--muted);
+    margin-top: 0.5rem;
+    max-width: 420px;
+  }
+
+  .retainer-badge {
+    background: linear-gradient(135deg, var(--accent), #b8923a);
+    color: #08090d;
+    border-radius: 100px;
+    padding: 0.6rem 1.5rem;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 2rem;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  /* ── HOW IT WORKS ── */
+  .process { background: var(--surface); }
+
+  .process-steps {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0;
+    margin-top: 4rem;
+    position: relative;
+  }
+
+  .process-steps::before {
+    content: '';
+    position: absolute;
+    top: 1.5rem;
+    left: calc(12.5% + 1rem);
+    right: calc(12.5% + 1rem);
+    height: 1px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2), var(--accent));
+    opacity: 0.3;
+  }
+
+  .step {
+    padding: 0 2rem;
+    text-align: center;
+  }
+
+  .step-num {
+    width: 3rem;
+    height: 3rem;
+    border-radius: 50%;
+    background: var(--card);
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--accent);
+    letter-spacing: 0.05em;
+    position: relative;
+    z-index: 1;
+  }
+
+  .step-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.1rem;
+    font-weight: 400;
+    color: var(--white);
+    margin-bottom: 0.6rem;
+  }
+
+  .step-desc {
+    font-size: 0.82rem;
+    color: var(--muted);
+    line-height: 1.7;
+  }
+
+  /* ── WHY US ── */
+  .why { background: var(--bg); }
+
+  .why-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 5rem;
+    align-items: center;
+    margin-top: 4rem;
+  }
+
+  .why-points {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
+
+  .why-point {
+    display: flex;
+    gap: 1.5rem;
+    align-items: flex-start;
+  }
+
+  .why-line {
+    width: 1px;
+    background: var(--accent);
+    flex-shrink: 0;
+    margin-top: 0.3rem;
+    height: 2.5rem;
+  }
+
+  .why-point-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.1rem;
+    font-weight: 400;
+    color: var(--white);
+    margin-bottom: 0.4rem;
+  }
+
+  .why-point-desc {
+    font-size: 0.85rem;
+    color: var(--muted);
+    line-height: 1.7;
+  }
+
+  .why-visual {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 3rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .why-visual::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse 80% 60% at 50% 30%, rgba(200,169,110,0.06), transparent);
+  }
+
+  .compare-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.82rem;
+  }
+
+  .compare-table th {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding: 0.8rem 1rem;
+    text-align: center;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .compare-table th:first-child { text-align: left; }
+
+  .compare-table td {
+    padding: 0.9rem 1rem;
+    border-bottom: 1px solid rgba(255,255,255,0.03);
+    color: var(--text);
+    text-align: center;
+  }
+
+  .compare-table td:first-child { text-align: left; color: var(--muted); }
+
+  .compare-table .check { color: var(--accent); font-size: 1rem; }
+  .compare-table .cross { color: #4a4040; }
+
+  /* ── CTA ── */
+  .cta-section {
+    background: var(--card);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    text-align: center;
+    padding: 7rem 4rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .cta-section::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse 70% 80% at 50% 50%, rgba(200,169,110,0.05), transparent);
+  }
+
+  .cta-section h2 { margin-bottom: 1rem; }
+
+  .cta-sub {
+    color: var(--muted);
+    margin-bottom: 2.5rem;
+    font-size: 0.95rem;
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    padding: 3rem 4rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid var(--border);
+    flex-wrap: wrap;
+    gap: 1.5rem;
+  }
+
+  .footer-logo {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.3rem;
+    color: var(--white);
+  }
+
+  .footer-logo span { color: var(--accent); }
+
+  .footer-links {
+    display: flex;
+    gap: 2rem;
+    list-style: none;
+  }
+
+  .footer-links a {
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 0.8rem;
+    letter-spacing: 0.08em;
+    transition: color 0.3s;
+  }
+
+  .footer-links a:hover { color: var(--accent); }
+
+  .footer-copy {
+    font-size: 0.75rem;
+    color: #3a3830;
+    font-family: 'DM Mono', monospace;
+  }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .hero-eyebrow { animation: fadeUp 0.7s ease forwards; }
+  h1 { animation: fadeUp 0.7s 0.15s ease both; }
+  .hero-sub { animation: fadeUp 0.7s 0.3s ease both; }
+  .hero-actions { animation: fadeUp 0.7s 0.45s ease both; }
+  .hero-stats { animation: fadeUp 0.7s 0.6s ease both; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 1024px) {
+    nav { padding: 1.2rem 2rem; }
+    section { padding: 5rem 2rem; }
+    .hero { padding: 8rem 2rem 5rem; }
+    .hero-stats { right: 2rem; }
+    .features-grid { grid-template-columns: 1fr 1fr; }
+    .process-steps { grid-template-columns: 1fr 1fr; gap: 2rem; }
+    .process-steps::before { display: none; }
+    .why-grid { grid-template-columns: 1fr; }
+    .upgrades-row { grid-template-columns: 1fr 1fr; }
+    footer { padding: 2rem; }
+    .divider { margin: 0 2rem; width: calc(100% - 4rem); }
+  }
+
+  @media (max-width: 768px) {
+    nav ul { display: none; }
+    h1 { font-size: 2.8rem; }
+    .hero-stats { position: static; flex-direction: row; margin-top: 3rem; flex-wrap: wrap; gap: 2rem; text-align: left; }
+    .features-grid { grid-template-columns: 1fr; }
+    .pricing-grid { grid-template-columns: 1fr; }
+    .process-steps { grid-template-columns: 1fr; }
+    .upgrades-row { grid-template-columns: 1fr; }
+    .pricing-header { flex-direction: column; }
+    .retainer-banner { flex-direction: column; text-align: center; }
+    footer { flex-direction: column; text-align: center; }
+    .footer-links { flex-wrap: wrap; justify-content: center; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="logo">Snap<span>turtle</span></div>
+  <ul>
+    <li><a href="#services">Services</a></li>
+    <li><a href="#pricing">Pricing</a></li>
+    <li><a href="#process">Process</a></li>
+    <li><a href="#why">Why Us</a></li>
+    <li><a href="mailto:Snapturtle.re@gmail.com" class="nav-cta">Get Started</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-grid"></div>
+  <div class="hero-content">
+    <div class="hero-eyebrow">Real Estate Video Editing</div>
+    <h1>Properties That<br><em>Sell Themselves</em></h1>
+    <p class="hero-sub">
+      Cinematic-quality video editing tailored for real estate agents & brokers. Fast turnaround. Stunning results. Every listing treated like a luxury property.
+    </p>
+    <div class="hero-actions">
+      <a href="#pricing" class="btn-primary">View Packages</a>
+      <a href="mailto:Snapturtle.re@gmail.com" class="btn-secondary">Send Your Footage</a>
+    </div>
+  </div>
+  <div class="hero-stats">
+    <div>
+      <div class="stat-num">8<span>hr</span></div>
+      <div class="stat-label">Priority Turnaround</div>
+    </div>
+    <div>
+      <div class="stat-num">10<span>%</span></div>
+      <div class="stat-label">Fleet Retainer Discount</div>
+    </div>
+    <div>
+      <div class="stat-num">24<span>/7</span></div>
+      <div class="stat-label">Support Available</div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- SERVICES -->
+<section class="features" id="services">
+  <div class="section-tag">What We Do</div>
+  <h2>Every Frame, Crafted<br>With Intention</h2>
+  <p class="section-sub">From raw drone footage to polished cinematic reels — we handle every step of your video workflow.</p>
+  <div class="features-grid">
+    <div class="feature-card">
+      <svg class="feat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path d="M15 10l4.553-2.276A1 1 0 0121 8.723v6.554a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+      </svg>
+      <div class="feat-title">Footage Culling & Stabilization</div>
+      <p class="feat-desc">We sift through every clip to select only the best shots, then smooth out any camera shake for a polished, professional look.</p>
+    </div>
+    <div class="feature-card">
+      <svg class="feat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"/>
+      </svg>
+      <div class="feat-title">Beat-Synced Edits & Music</div>
+      <p class="feat-desc">Every cut lands on the beat. We pair your footage with trending background music, creating an immersive rhythm that holds attention.</p>
+    </div>
+    <div class="feature-card">
+      <svg class="feat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path d="M12 3v1m0 16v1M4.22 4.22l.707.707m12.02 12.02l.707.707M1 12h2m18 0h2M4.22 19.78l.707-.707M18.95 5.05l.707-.707"/>
+        <circle cx="12" cy="12" r="4"/>
+      </svg>
+      <div class="feat-title">Cinematic Color Grading</div>
+      <p class="feat-desc">From standard white-balance correction to advanced cinematic grades, we make every property look its absolute best on screen.</p>
+    </div>
+    <div class="feature-card">
+      <svg class="feat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"/>
+      </svg>
+      <div class="feat-title">Sky Replacements</div>
+      <p class="feat-desc">Grey overcast day? No problem. We replace dull skies with stunning golden-hour or blue-sky alternatives — completely free.</p>
+    </div>
+    <div class="feature-card">
+      <svg class="feat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path d="M13 10V3L4 14h7v7l9-11h-7z"/>
+      </svg>
+      <div class="feat-title">Smooth Speed Ramps</div>
+      <p class="feat-desc">Dynamic speed ramping on key transitions adds a high-production cinematic feel that sets your listings apart from the competition.</p>
+    </div>
+    <div class="feature-card">
+      <svg class="feat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4"/>
+      </svg>
+      <div class="feat-title">MLS-Compliant Versions</div>
+      <p class="feat-desc">Need a compliant version for the MLS portal? We'll add an MLS-formatted cut to your package at no extra charge.</p>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section id="pricing">
+  <div class="pricing-header">
+    <div>
+      <div class="section-tag">Transparent Pricing</div>
+      <h2>Choose Your<br>Package</h2>
+    </div>
+    <p class="section-sub">No hidden fees. No contracts. Just great edits delivered fast.</p>
+  </div>
+
+  <div class="pricing-grid">
+    <!-- STANDARD -->
+    <div class="price-card">
+      <div class="plan-name">Standard Package</div>
+      <span class="plan-tagline">The perfect, clean edit for everyday listings.</span>
+      <div class="plan-price">
+        <span class="price-dollar">$</span>
+        <span class="price-amount">45</span>
+        <span class="price-per">/ video</span>
+      </div>
+      <div class="plan-turnaround">⏱ Turnaround: 12–24 Hours</div>
+      <div class="plan-length">📐 Length: Up to 60 seconds</div>
+      <ul class="feature-list">
+        <li>Footage Culling & Stabilization</li>
+        <li>Beat-Synced Cuts & Smooth Flow</li>
+        <li>Smooth Speed Ramps</li>
+        <li>Standard Color Correction & White Balance</li>
+        <li class="highlight">Free Drop House, Sky Replacements & Masking</li>
+        <li>Trending Background Music</li>
+        <li>MLS-Compliant Version (on request)</li>
+      </ul>
+      <div class="edit-note">Up to 5 revision rounds included</div>
+      <a href="mailto:Snapturtle.re@gmail.com?subject=Standard Package Inquiry" class="plan-cta cta-outline">Get Started →</a>
+    </div>
+
+    <!-- PREMIUM -->
+    <div class="price-card featured">
+      <div class="price-badge">Most Popular</div>
+      <div class="plan-name">Premium Package</div>
+      <span class="plan-tagline">Cinematic storytelling for luxury properties & agent branding.</span>
+      <div class="plan-price">
+        <span class="price-dollar">$</span>
+        <span class="price-amount">60</span>
+        <span class="price-per">/ video</span>
+      </div>
+      <div class="plan-turnaround">⚡ Priority Turnaround: 8–12 Hours</div>
+      <div class="plan-length">📐 Length: Up to 90 seconds</div>
+      <ul class="feature-list">
+        <li class="highlight">Everything in Standard Package</li>
+        <li>Advanced Cinematic Color Grading</li>
+        <li>Immersive Sound Design</li>
+        <li>Animated Trending Captions</li>
+        <li>Agent / Realtor Intro Integration</li>
+        <li class="highlight">Free Drop House, Sky Replacements & Masking</li>
+        <li>MLS-Compliant Version (on request)</li>
+      </ul>
+      <div class="edit-note">Up to 10 revision rounds included</div>
+      <a href="mailto:Snapturtle.re@gmail.com?subject=Premium Package Inquiry" class="plan-cta cta-filled">Get Started →</a>
+    </div>
+  </div>
+
+  <!-- OPTIONAL UPGRADES -->
+  <div class="section-tag" style="margin-top: 3.5rem; margin-bottom: 1rem;">Optional Add-Ons</div>
+  <div class="upgrades-row">
+    <div class="upgrade-card">
+      <div>
+        <div class="upgrade-name">Extended Duration +1 min</div>
+        <div class="upgrade-desc">Add up to 1 extra minute to any package</div>
+      </div>
+      <div class="upgrade-price">+$15</div>
+    </div>
+    <div class="upgrade-card">
+      <div>
+        <div class="upgrade-name">AI Effect</div>
+        <div class="upgrade-desc">Premium AI-driven visual effects overlay</div>
+      </div>
+      <div class="upgrade-price">+$15</div>
+    </div>
+    <div class="upgrade-card" style="border-color: rgba(126,184,200,0.25);">
+      <div>
+        <div class="upgrade-name" style="color: var(--accent2);">Combine Both Add-Ons</div>
+        <div class="upgrade-desc">Extended duration + AI effect together</div>
+      </div>
+      <div class="upgrade-price" style="color: var(--accent2);">+$30</div>
+    </div>
+  </div>
+
+  <!-- FLEET RETAINER -->
+  <div class="retainer-banner">
+    <div>
+      <div class="retainer-tag">Fleet Retainer Deal</div>
+      <div class="retainer-title">10 Videos Pack —<br>Lock In & Save</div>
+      <p class="retainer-desc">Stabilize your cash flow and secure priority processing across all your listings. Prepay for 10 videos and save 10% on your entire order.</p>
+    </div>
+    <div style="text-align: center;">
+      <div class="retainer-badge">10% OFF</div>
+      <div style="font-family: 'DM Mono', monospace; font-size: 0.65rem; letter-spacing: 0.12em; color: var(--muted); margin-top: 0.8rem; text-transform: uppercase;">Priority Processing Guaranteed</div>
+      <a href="mailto:Snapturtle.re@gmail.com?subject=Fleet Retainer - 10 Videos Pack" class="btn-primary" style="margin-top: 1rem; display: inline-block; font-size: 0.75rem;">Claim Offer →</a>
+    </div>
+  </div>
+</section>
+
+<!-- PROCESS -->
+<section class="process" id="process">
+  <div class="section-tag">How It Works</div>
+  <h2>From Raw Footage<br>to Ready-to-Post</h2>
+  <div class="process-steps">
+    <div class="step">
+      <div class="step-num">01</div>
+      <div class="step-title">Send Your Footage</div>
+      <p class="step-desc">Email us or share a Dropbox / Google Drive link with your raw clips. Include any notes or preferences.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">02</div>
+      <div class="step-title">We Get to Work</div>
+      <p class="step-desc">Our editors start immediately — culling, syncing, coloring, and polishing every second of your video.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">03</div>
+      <div class="step-title">Review & Revise</div>
+      <p class="step-desc">Receive your edit within the promised turnaround window. Request revisions — we accommodate up to your plan limit.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">04</div>
+      <div class="step-title">Download & Post</div>
+      <p class="step-desc">Download your final, export-ready video and post directly to MLS, Instagram, YouTube, or wherever you list.</p>
+    </div>
+  </div>
+</section>
+
+<!-- WHY US -->
+<section class="why" id="why">
+  <div class="section-tag">Why Snapturtle</div>
+  <h2>The Advantage That<br>Agents Keep Coming Back For</h2>
+  <div class="why-grid">
+    <div class="why-points">
+      <div class="why-point">
+        <div class="why-line"></div>
+        <div>
+          <div class="why-point-title">Real Estate Specialists</div>
+          <p class="why-point-desc">We edit real estate video exclusively. That focus means we understand pacing, buyer psychology, and what makes a property irresistible on screen.</p>
+        </div>
+      </div>
+      <div class="why-point">
+        <div class="why-line"></div>
+        <div>
+          <div class="why-point-title">Lightning-Fast Turnaround</div>
+          <p class="why-point-desc">Standard listings in 12–24 hours. Premium priority orders in as little as 8 hours. Your listing goes live while the competition is still waiting.</p>
+        </div>
+      </div>
+      <div class="why-point">
+        <div class="why-line"></div>
+        <div>
+          <div class="why-point-title">Free Sky Replacements & Masking</div>
+          <p class="why-point-desc">Most agencies charge extra for sky replacement. We include it free in every package because great property visuals shouldn't be held hostage by weather.</p>
+        </div>
+      </div>
+      <div class="why-point">
+        <div class="why-line"></div>
+        <div>
+          <div class="why-point-title">Generous Revision Policy</div>
+          <p class="why-point-desc">Up to 5 rounds on Standard, up to 10 on Premium. We don't quit until you're completely happy with the final cut.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="why-visual">
+      <div class="section-tag" style="text-align: left; margin-bottom: 1.5rem;">Snapturtle vs. The Rest</div>
+      <table class="compare-table">
+        <thead>
+          <tr>
+            <th>Feature</th>
+            <th>Snapturtle</th>
+            <th>Others</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>Real estate focus</td><td class="check">✦</td><td class="cross">✗</td></tr>
+          <tr><td>Free sky replacement</td><td class="check">✦</td><td class="cross">✗</td></tr>
+          <tr><td>8–24 hr turnaround</td><td class="check">✦</td><td class="cross">✗</td></tr>
+          <tr><td>Beat-synced editing</td><td class="check">✦</td><td class="check">✦</td></tr>
+          <tr><td>Cinematic color grading</td><td class="check">✦</td><td class="cross">✗</td></tr>
+          <tr><td>Agent intro integration</td><td class="check">✦</td><td class="cross">✗</td></tr>
+          <tr><td>MLS-compliant output</td><td class="check">✦</td><td class="cross">✗</td></tr>
+          <tr><td>Retainer discounts</td><td class="check">✦</td><td class="cross">✗</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- FINAL CTA -->
+<section class="cta-section">
+  <div style="position: relative;">
+    <div class="section-tag" style="text-align: center;">Ready to Elevate Your Listings?</div>
+    <h2>Send Us Your Footage Today</h2>
+    <p class="cta-sub">No contracts. No minimums. Just stunning real estate videos delivered fast.</p>
+    <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+      <a href="mailto:Snapturtle.re@gmail.com?subject=New Video Editing Inquiry" class="btn-primary">Email Us Now</a>
+      <a href="#pricing" class="btn-secondary">Review Packages</a>
+    </div>
+    <p style="margin-top: 2rem; font-family: 'DM Mono', monospace; font-size: 0.7rem; color: var(--muted); letter-spacing: 0.1em;">Snapturtle.re@gmail.com</p>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">Snap<span>turtle</span></div>
+  <ul class="footer-links">
+    <li><a href="#services">Services</a></li>
+    <li><a href="#pricing">Pricing</a></li>
+    <li><a href="#process">Process</a></li>
+    <li><a href="mailto:Snapturtle.re@gmail.com">Contact</a></li>
+  </ul>
+  <div class="footer-copy">© 2025 Snapturtle — Real Estate Video Editing</div>
+</footer>
+
+</body>
+</html>
